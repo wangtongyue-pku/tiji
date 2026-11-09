@@ -162,25 +162,43 @@ setInterval(() => {
 /* ------------------------------- 文件监听 ------------------------------- */
 
 let reloadTimer = null;
+let pollTimer = null;
+
+function scheduleReload(reason) {
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(() => {
+    try {
+      const before = store.stamp;
+      store.reload();
+      if (store.stamp !== before) broadcast(reason);
+    } catch (err) {
+      console.error('重新扫描失败：', err.message);
+    }
+  }, 320);
+}
 
 function watchContent() {
-  try {
-    fs.watch(store.contentDir, { recursive: true }, (event, filename) => {
-      const name = String(filename || '');
-      if (!name || name.includes('.state') || name.endsWith('.tmp')) return;
-      clearTimeout(reloadTimer);
-      reloadTimer = setTimeout(() => {
-        try {
-          const before = store.stamp;
-          store.reload();
-          if (store.stamp !== before) broadcast('file-change');
-        } catch (err) {
-          console.error('重新扫描失败：', err.message);
-        }
-      }, 320);
-    });
-  } catch (err) {
-    console.error('无法监听 content 目录：', err.message);
+  // 逐个目录监听，不用 recursive —— Node 18 在 Linux 上不支持递归监听
+  const dirs = [store.entriesDir, store.topicsDir, store.practiceDir, store.contentDir];
+  let watched = 0;
+
+  for (const dir of dirs) {
+    try {
+      fs.watch(dir, (event, filename) => {
+        const name = String(filename || '');
+        if (!name || name.endsWith('.tmp') || name.startsWith('.state')) return;
+        scheduleReload('file-change');
+      });
+      watched += 1;
+    } catch (err) {
+      console.error(`无法监听 ${dir}：`, err.message);
+    }
+  }
+
+  if (!watched) {
+    console.error('目录监听不可用，改用每 2 秒轮询。');
+    pollTimer = setInterval(() => scheduleReload('poll'), 2000);
+    pollTimer.unref();
   }
 }
 
