@@ -1,0 +1,23 @@
+{
+  "name": "tiji",
+  "version": "1.0.0",
+  "description": "A local-first, file-based learning log for the questions you asked AI: bugs, wrong ideas, knowledge gaps, review and practice.",
+  "license": "MIT",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js --open",
+    "test": "node --test"
+  },
+  "keywords": [
+    "learning",
+    "notes",
+    "markdown",
+    "spaced-repetition",
+    "local-first",
+    "chatgpt",
+    "study-log"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

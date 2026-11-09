@@ -1,0 +1,16 @@
+node_modules/
+
+# local machine state, never commit
+config.json
+content/entries/
+content/topics/
+content/practice/
+content/.state/
+content/site.json
+
+# tooling / OS noise
+.tmp-*/
+.dev/
+.DS_Store
+Thumbs.db
+*.log

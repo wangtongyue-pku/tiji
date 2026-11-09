@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+# Windows 批处理必须是 CRLF，否则 cmd 解析会错位
+*.cmd text eol=crlf
+
+*.png binary
