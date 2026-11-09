@@ -1,191 +1,186 @@
 # 题迹 · Tiji
 
-**A local-first learning log for the questions you asked AI.**
-Every question becomes a Markdown file; every file becomes a lesson you can review.
+**把「问过 AI 的问题」变成能反复复习的笔记。**
+一条记录 = 一个 Markdown 文件，内容全在你自己的硬盘上。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)
 
-![Overview](docs/overview.png)
+![概览](docs/overview.png)
 
-> The interface is in Chinese. The data format is plain Markdown, so everything else is language-agnostic.
+English: **[README.en.md](README.en.md)**
 
 ---
 
-## The problem
+## 它解决什么
 
-You ask ChatGPT why your code breaks. It explains. You nod. Three weeks later you hit the same bug and remember nothing.
+你问 ChatGPT 为什么这段代码报错，它解释得很清楚，你点头，三周后同一个坑再踩一次。
 
-Notes don't fix this, because most notes record **the answer**. What you actually need is a record of **the wrong idea you had** — that's what lets you stop at the same fork in the road next time.
+普通笔记救不了这个问题——因为它们记的是**答案**。真正有用的是记下**你当时错在哪**，下次走到同一个岔路口才会停下来。
 
-Tiji turns Q&A into that record, and adds the machinery to keep it alive: weak-topic detection, spaced repetition, and practice questions.
+题迹把一次问答拆成结构化的一条记录：
 
-Each entry holds:
-
-| Field | Why it exists |
+| 字段 | 为什么要有 |
 | --- | --- |
-| **The question** | what you actually asked, in your own words |
-| **Your attempt** | the wrong idea you had — the most valuable field |
-| **Root cause** | the mechanism, not the symptom |
-| **Fix** | the correct approach |
-| **Takeaway** | one line: what to think of next time |
-| **Before / after code** | side-by-side, so you can see the delta |
+| 原始问题 | 你当时到底在问什么，用自己的话 |
+| 当时的思路 | 你错误地以为是什么——**最有价值的一栏** |
+| 错因 | 机制层面的原因，不是现象复述 |
+| 解法 | 正确做法 |
+| 心法 | 一句话：下次第一反应该想到什么 |
+| 前后代码 | 错误写法与修正写法并排 |
 
-## Why files instead of a database?
+再加上：掌握率、12 周学习热力图、**最薄弱知识点**（按重复踩坑次数 × 难度加权）、间隔重复复习、配套练习。
 
-Because the second user of this app is an AI.
+## 为什么是文件，不是数据库
 
-Content lives in `content/` — one Markdown file per entry. That means an agent (ChatGPT Work, Claude Code, Cursor, a shell script) can just **create or edit files**. No API, no schema migration, no sync layer.
+因为这个应用的第二个用户是 AI。
 
-- **Save a file → the page updates within a second** (the server watches the folder).
-- **The filename is the identity** — rewriting the same file updates the entry instead of duplicating it.
-- **`git` works out of the box** — every AI edit is a diff you can review and roll back.
-- **Nothing leaves your machine.**
+内容都在 `content/` 目录，一条记录一个 `.md` 文件。这意味着 ChatGPT Work、Claude Code、Cursor、随便一个脚本，**直接读写文件就够了**：
 
-## Quick start
+- 保存文件 → 网页 1 秒内自动更新（服务在监听目录）；
+- **文件名就是 ID**，重写同一个文件是更新，不会刷出重复条目；
+- `git` 直接可用，AI 的每次改动都是一个可 diff、可回滚的提交；
+- 数据不出本机。
 
-Requires **Node.js 18+**. There are no dependencies and no build step.
+## 快速开始
+
+需要 **Node.js 18+**。没有依赖，没有构建步骤。
 
 ```bash
 git clone https://github.com/<you>/tiji.git
 cd tiji
-npm start          # or: node server.js --open
+npm start          # 或 node server.js --open
 ```
 
-- **Windows**: double-click `start.cmd`
-- **macOS / Linux**: `./start.sh`
+- **Windows**：双击 `start.cmd`
+- **macOS / Linux**：`./start.sh`
 
-Then open <http://127.0.0.1:4321>. The first run seeds ten demo entries so the app isn't empty.
+打开 <http://127.0.0.1:4321>。首次启动会写入 10 条示例数据，方便你看清长什么样，在「设置」里可以一键清空。
 
-## What's inside
+## 界面
 
-| Page | What it does |
+| 页面 | 作用 |
 | --- | --- |
-| **Overview** | mastery rate, due-for-review, 12-week activity heatmap, weakest topics (weighted by repeat count × difficulty) |
-| **Entries** | search and filter; the detail drawer shows question → wrong attempt → root cause → fix → code diff |
-| **Knowledge map** | per-topic summary, key points, common pitfalls, progress |
-| **Practice** | hint / reveal answer; answering feeds the review schedule |
-| **AI access** | folder path, format sample, a ready-to-paste prompt, Markdown import |
-| **Settings** | profile, dark mode, export, restore demo data |
+| **概览** | 掌握率、今日待复习、12 周热力图、最薄弱知识点 |
+| **题库** | 搜索筛选；详情里是 问题 → 错误思路 → 错因 → 解法 → 代码对比 |
+| **知识地图** | 每个主题的总结、要点、常见坑、掌握进度 |
+| **练习** | 看提示 / 看答案，作答结果自动影响对应条目的复习间隔 |
+| **AI 接入** | 文件夹位置、格式样例、可直接复制的指令、Markdown 导入 |
+| **设置** | 资料、深色模式、导出、恢复示例数据 |
 
-## The file format
+![条目详情](docs/entry.png)
 
-`content/entries/<id>.md`:
+## 文件格式
+
+`content/entries/<id>.md`：
 
 ```markdown
 ---
-title: Python mutable default arguments are evaluated once
+title: Python 默认参数只在定义时求值一次
 type: bug
-topic: Python basics
-tags: [python, functions]
+topic: Python 基础
+tags: [python, 函数]
 difficulty: 2
 status: learning
 ---
 
-# Python mutable default arguments are evaluated once
+# Python 默认参数只在定义时求值一次
 
-## question
-Second call still has the previous items in the list.
+## 原始问题
+第二次调用时列表里还留着上次的元素。
 
-## attempt
-I thought it was global variable pollution.
+## 当时的思路
+以为是全局变量污染。
 
-## cause
-`[]` is created once at function definition time and shared by every call.
+## 错因
+`[]` 在函数定义时只创建一次，所有调用共享同一个对象。
 
-## solution
-Use `None` as the sentinel and create the list inside the function.
+## 解法
+默认值用 `None` 占位，函数体内再创建。
 
-## takeaway
-When you see a default value, ask: when is it evaluated, and who shares it?
-
-## code_before
-```python
-def collect(x, acc=[]):
-    acc.append(x)
-    return acc
-```
+## 心法
+看到默认值先问：它什么时候求值？谁和谁共享？
 ```
 
-Headings can be English (`question`, `attempt`, `cause`, `solution`, `takeaway`) or Chinese (`原始问题`, `当时的思路`, `错因`, `解法`, `心法`); the app writes the Chinese ones. Unknown sections are kept as-is instead of being dropped. Full spec, including topics and practice files: **[AGENTS.md](AGENTS.md)** (written for an AI, readable by humans).
+小节标题中英文都认（`question` / `attempt` / `cause` / `solution` / `takeaway`，或 `原始问题` / `当时的思路` / `错因` / `解法` / `心法`），认不出的段落会原样保留，不会丢。完整规范见 **[AGENTS.md](AGENTS.md)**。
 
 ```text
 content/
-├─ entries/     one file per question
-├─ topics/      one file per subject summary
-├─ practice/    one file per exercise
-├─ site.json    profile
-└─ .state/      review schedule and attempt history (machine-managed)
+├─ entries/     一条问题一个文件
+├─ topics/      一个主题一个文件
+├─ practice/    一道练习一个文件
+├─ site.json    个人资料
+└─ .state/      复习进度（程序维护，别手改）
 ```
 
-## Let an AI maintain it
+## 让 AI 维护它
 
-1. Open the **AI access** page and copy the prompt under "3 · 把这段话发给 ChatGPT".
-2. Give it to your agent together with the conversation you want archived.
+1. 打开网页「AI 接入」页，复制第 3 节的指令；
+2. 连同你想归档的那段对话，一起发给你的 AI。
 
-The prompt states the folder, the exact format, the four `type` values, and the rule "don't touch `.state/`". If the agent cannot write to the filesystem, paste its Markdown output into the import box — it lands as the same `.md` file.
+指令里写清了目录、格式、四种 `type` 的含义，以及「不要动 `.state/`」。如果它不能读写文件，就让它按格式输出 Markdown，粘贴到第 4 节的导入框——落地的还是同一个 `.md`。
 
-## Optional HTTP API
+![AI 接入](docs/ai.png)
 
-Only needed for automation. Full machine-readable contract: `GET /api`.
+## 可选接口
 
-| Method | Path | Purpose |
+只有做自动化时才需要。完整契约：`GET /api`。
+
+| 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/snapshot` | everything at once |
-| GET | `/api/entries?q=&topic=&type=` | search |
-| POST | `/api/entries` | create (JSON) |
-| POST | `/api/entries/raw` | create from a Markdown blob |
-| PATCH | `/api/entries/:id` | partial update |
-| POST | `/api/entries/:id/review` | record a review `{grade: 0-5}` |
-| POST | `/api/practice/:id/attempt` | record an answer |
-| POST | `/api/import` | bulk `{entries, topics, practice}` |
-| GET | `/api/stats` | statistics |
+| GET | `/api/snapshot` | 一次取回全部数据 |
+| GET | `/api/entries?q=&topic=&type=` | 检索 |
+| POST | `/api/entries` | 新建（JSON） |
+| POST | `/api/entries/raw` | 传一段 Markdown 直接入库 |
+| PATCH | `/api/entries/:id` | 局部更新 |
+| POST | `/api/entries/:id/review` | 记录复习评分 |
+| POST | `/api/practice/:id/attempt` | 记录作答 |
+| POST | `/api/import` | 批量导入 |
+| GET | `/api/stats` | 统计 |
 
-Writes require `Authorization: Bearer <token>` — the token is in `config.json`. Reading and editing files directly needs no token at all.
+写操作需要 `Authorization: Bearer <token>`（令牌在 `config.json`）。直接改文件则完全不需要。
 
-## Configuration
+## 配置
 
-`config.json` is generated on first run and git-ignored:
+首次启动生成 `config.json`（已 git 忽略）：
 
 ```json
 { "port": 4321, "host": "127.0.0.1", "token": "…" }
 ```
 
-Change `host` to `0.0.0.0` only if you understand that anyone who can reach the port can write your data — replace the token first.
+把 `host` 改成 `0.0.0.0` 前请先换一个强随机 token——能访问这个端口的人就能改你的数据。
 
-## FAQ
+## 常见问题
 
-**The page won't open.** The server isn't running. Double-click `start.cmd` (Windows) and leave the window open; it's a local process, not a service.
+**网页打不开。** 服务没在跑。Windows 双击 `start.cmd`，**窗口不要关**——它是本地进程，不是系统服务。
 
-**Port already in use.** Edit `port` in `config.json`, restart.
+**端口被占用。** 改 `config.json` 里的 `port`，重启。
 
-**Where is my data?** In `content/`. Back up by copying the folder; `git init` in the project root if you want history.
+**数据在哪？** 全在 `content/`。备份就是复制这个文件夹；想要历史记录就在项目根目录 `git init`。
 
-**Multiple machines?** Put `content/` in a private git repo and sync it, or keep the folder in a cloud drive.
+**想多设备同步？** 把 `content/` 单独放进一个私有 git 仓库，或放网盘同步。
 
-**Start automatically on Windows.** Double-click `autostart-on.cmd` (runs minimized at login); `autostart-off.cmd` removes it.
+**Windows 开机自启。** 双击 `autostart-on.cmd`（登录后最小化启动，不弹浏览器），`autostart-off.cmd` 取消。
 
-## Development
+## 开发
 
 ```bash
-npm test           # node --test, no test dependencies
+npm test           # node --test，没有测试依赖
 ```
 
 ```
-server.js          HTTP server, static files, file watcher, SSE
-src/filestore.js   folder ⇄ records
-src/markdown.js    Markdown parse / serialize
-src/api.js         optional REST API
-src/stats.js       statistics, weak topics, heatmap
-src/seed.js        demo data
-public/            vanilla HTML/CSS/JS frontend
+server.js          HTTP 服务、静态文件、目录监听、SSE 推送
+src/filestore.js   文件夹 ⇄ 记录
+src/markdown.js    Markdown 解析 / 序列化
+src/api.js         可选的 REST API
+src/stats.js       统计、薄弱点、热力图
+src/seed.js        示例数据
+public/            原生 HTML/CSS/JS 前端
 ```
 
-Environment overrides (used by the test suite): `TIJI_PORT`, `TIJI_HOST`, `TIJI_CONTENT_DIR`, `TIJI_CONFIG`.
+测试用到的环境变量：`TIJI_PORT`、`TIJI_HOST`、`TIJI_CONTENT_DIR`、`TIJI_CONFIG`。
 
-## License
+## 许可证
 
 [MIT](LICENSE) © Tiji contributors
-
-中文说明见 **[README.zh-CN.md](README.zh-CN.md)**。
