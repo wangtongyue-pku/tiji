@@ -158,6 +158,8 @@ Change `host` to `0.0.0.0` only if you understand that anyone who can reach the 
 
 **The page won't open.** The server isn't running. Double-click `start.cmd` (Windows) and leave the window open; it's a local process, not a service.
 
+**`start.cmd` fails with `Cannot find module ... server.js`.** The launcher was copied away from the project. It must sit next to `server.js`; for a desktop launcher, create a *shortcut* to `start.cmd` with the project folder as its working directory instead of copying the file.
+
 **Port already in use.** Edit `port` in `config.json`, restart.
 
 **Where is my data?** In `content/`. Back up by copying the folder; `git init` in the project root if you want history.

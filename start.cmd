@@ -3,6 +3,18 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
+if not exist "%~dp0server.js" (
+  echo.
+  echo  这个文件夹里没有 server.js，启动不了。
+  echo  当前文件夹：%~dp0
+  echo.
+  echo  start.cmd 要和 server.js 放在同一个文件夹里。
+  echo  在桌面上请用「题迹」快捷方式，不要单独复制 start.cmd。
+  echo.
+  pause
+  exit /b 1
+)
+
 set "OPEN_FLAG=--open"
 if /i "%~1"=="--quiet" set "OPEN_FLAG="
 

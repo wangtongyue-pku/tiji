@@ -155,6 +155,8 @@ content/
 
 **网页打不开。** 服务没在跑。Windows 双击 `start.cmd`，**窗口不要关**——它是本地进程，不是系统服务。
 
+**双击后报 `Cannot find module ... server.js`。** 你把 `start.cmd` 单独复制到别处了。它必须和 `server.js` 待在同一个文件夹里；想在桌面放一个入口，就建一个指向 `start.cmd` 的快捷方式（起始位置设为项目目录），而不是复制文件本身。
+
 **端口被占用。** 改 `config.json` 里的 `port`，重启。
 
 **数据在哪？** 全在 `content/`。备份就是复制这个文件夹；想要历史记录就在项目根目录 `git init`。
